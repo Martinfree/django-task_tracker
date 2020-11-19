@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+    postgres:
+        image: postgres:12-alpine
+        restart: always
+        container_name: "postgresql"
+        env_file:
+            - .env 
+        ports:
+            - "${DB_PORT}:${DB_PORT}"
+        environment:
+            POSTGRES_PASSWORD: ${DB_PASS}
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_DB: ${DB_NAME}
+
+    api:
+        build: ./tracker
+        restart: always
+        container_name: "django-task_tracker"
+        env_file:
+            - .env 
+        volumes:
+            - ./tracker:/opt/proj/
+        ports:
+            - "80:8000"
+        depends_on:
+            - postgres
+        environment:
+            - DB_HOST=${DB_HOST}
+            - DB_USER=${DB_USER}
+            - DB_PASS=${DB_PASS}
+            - DB_NAME=${DB_NAME}
+        command: gunicorn --reload wsgi:application -w 2 -b :8000 -t 120
+        
