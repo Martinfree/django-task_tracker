@@ -63,7 +63,7 @@ class BoardAPIView(APIView):
     
     def delete(self,request,*args,**kwargs):
         try:
-            obj=Board.objects.filter(id=kwargs.get('id'))
+            obj=Board.objects.get(id=kwargs.get('id'))
             obj.delete()
             return Response(status=status.HTTP_200_OK)
         except Board.DoesNotExist: 
