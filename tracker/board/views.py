@@ -104,7 +104,7 @@ class TaskAPIView(APIView):
             self.queryset = Task.objects.get(id=kwargs.get("id"))
             serializer=self.serializer_class(self.queryset)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except (Board.DoesNotExist, TypeError): 
+        except Task.DoesNotExist: 
             return Response(status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
@@ -114,17 +114,35 @@ class TaskAPIView(APIView):
         try:
             self.queryset = Task.objects.get(id=kwargs.get('id'))
             serializer = self.serializer_class(data=request.data)
-        except Board.DoesNotExist: 
+        except Task.DoesNotExist: 
             return Response(status=status.HTTP_404_NOT_FOUND)
         if serializer.is_valid():
             serializer.update(instance=self.queryset,validated_data=request.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(data=serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self,request,*args,**kwargs):
         try:
             obj=Task.objects.get(id=kwargs.get('id'))
             obj.delete()
             return Response(status=status.HTTP_200_OK)
-        except Board.DoesNotExist: 
+        except Task.DoesNotExist: 
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+class TasksFilterAPIView(APIView):
+    lookup_field = 'id'
+    permission_classes = [AllowAny]
+    queryset = Task.objects.none()
+    serializer_class = TaskSerializer
+
+    def get(self,request,*args,**kwargs):
+        if kwargs.get('id') != "":
+            self.queryset = Task.objects.filter(board_id=kwargs.get('id'))
+            serializer = self.serializer_class(self.queryset, many=True)
+        else:
+            self.queryset = Task.objects.filter(board__isnull=True)
+            serializer = self.serializer_class(self.queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
