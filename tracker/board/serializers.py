@@ -37,8 +37,13 @@ class TaskUpdateSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = Task
-        fields = ('head',
+        fields = (
+                'head',
                 'description',
-                'status')
+                'status'
+                )
+
+        extra_kwargs = {'board': {'required': False}}
+            
     
 

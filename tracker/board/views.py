@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from board.serializers import (BoardSerializer,TaskSerializer,
-                              TaskCreateSerializer,)
+                              TaskCreateSerializer, TaskUpdateSerializer)
 
 from board.models import Board,Task
 
@@ -29,7 +29,7 @@ class BoardsAPIView(APIView):
         
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -61,6 +61,8 @@ class BoardAPIView(APIView):
         if serializer.is_valid():
             serializer.update(instance=self.queryset,validated_data=request.data)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self,request,*args,**kwargs):
         try:
@@ -87,7 +89,7 @@ class TasksAPIView(APIView):
         
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,6 +114,7 @@ class TaskAPIView(APIView):
 
     def put(self,request,*args,**kwargs):
         try:
+            self.serializer_class = TaskUpdateSerializer
             self.queryset = Task.objects.get(id=kwargs.get('id'))
             serializer = self.serializer_class(data=request.data)
         except Task.DoesNotExist: 
@@ -137,7 +140,7 @@ class TasksFilterAPIView(APIView):
     serializer_class = TaskSerializer
 
     def get(self,request,*args,**kwargs):
-        if kwargs.get('id') != "":
+        if kwargs.get('id'):
             self.queryset = Task.objects.filter(board_id=kwargs.get('id'))
             serializer = self.serializer_class(self.queryset, many=True)
         else:
