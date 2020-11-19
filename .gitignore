@@ -14,7 +14,10 @@ __pycache__/
 ## Tests coverage
 .coverage
 .coveragerc
-**/**/htmlcov
+**/htmlcov
 
 ## Migrations
-**/**/migrations
+**/migrations
+
+## Static files
+**/media/static
