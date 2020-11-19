@@ -22,6 +22,7 @@ services:
             - .env 
         volumes:
             - ./tracker:/opt/proj/
+            - ./tracker/media:/opt/proj/media
         ports:
             - "80:8000"
         depends_on:
