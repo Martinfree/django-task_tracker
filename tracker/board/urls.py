@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.urls import path,include
 
-from board.views import BoardsAPIView,BoardAPIView
+from board.views import (BoardsAPIView,BoardAPIView,
+                        TasksAPIView,TaskAPIView)
 
 
 urlpatterns = [
         path('board/',BoardsAPIView.as_view(),name='boards'),    
-        path('board/<int:id>/',BoardAPIView.as_view(),name='board'),    
+        path('board/<int:id>/', BoardAPIView.as_view(),name='board'),    
+        path('tasks/', TasksAPIView.as_view(),name='tasks'),    
+        path('task/<int:id>/', TaskAPIView.as_view(),name='task'),  
 ]
 
 
